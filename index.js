@@ -1,7 +1,3 @@
-console.log("js is connected");
-
-
-const title = document.querySelector("h1");          
 
 const items = document.querySelectorAll(".todo");   
  
@@ -32,12 +28,41 @@ list.addEventListener("click", (event) => {
      toggleTodo(id);  }
      
      });
-     let todos = []; // single source of truth
+     let todos = [];
+     let draggedId = null;
  function render() { 
   const list = document.querySelector("#todo-list"); 
    list.replaceChildren(    ...todos.map((t) => { 
        
-    const li = document.createElement("li");     
+    const li = document.createElement("li");  
+    li.draggable  = true;
+
+  li.addEventListener("dragstart", () => {
+    draggedId = t.id;
+  console.log("Dragging:", draggedId);
+  });
+  li.addEventListener("dragover", (e) => {
+  e.preventDefault();
+});
+li.addEventListener("drop", () => {
+
+   const draggedIndex = todos.findIndex(
+    todo => todo.id === draggedId
+  );
+
+  const droppedIndex = todos.findIndex(
+    todo => todo.id === t.id
+  );
+
+  const [movedTodo] = todos.splice(draggedIndex, 1);
+
+  todos.splice(droppedIndex, 0, movedTodo);
+
+  render();
+
+
+
+});
      li.dataset.id = t.id;     
       li.innerHTML = `       
  <input type="checkbox" class="check" ${t.done ? "checked" : ""} />      
@@ -46,6 +71,7 @@ list.addEventListener("click", (event) => {
      return li;  
        })  
        );} 
+       
        
     function addTodo(title) { 
      todos = [...todos, {
